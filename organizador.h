@@ -5,13 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Nodo del √Årbol Binario de B√∫squeda para almacenar √≠tems.
-// Los √≠tems se guardan ordenados alfab√©ticamente por nombre.
+// Nodo del ¡rbol Binario de B˙squeda para almacenar Ìtems.
+// Los Ìtems se guardan ordenados alfabÈticamente por nombre.
 typedef struct nodoItem {
     char nombre[100];
     char info[500];
-    struct nodoItem *izq;   // Sub√°rbol izquierdo
-    struct nodoItem *der;   // Sub√°rbol derecho
+    struct nodoItem *izq;   // Sub·rbol izquierdo
+    struct nodoItem *der;   // Sub·rbol derecho
 } NodoItem;
 
 /* Adelanto para detectar los punteros*/
@@ -22,13 +22,13 @@ typedef struct relacion {
     struct relacion *sig;
 } Relacion;
 
-// Representa una categor√≠a del organizador.
+// Representa una categorÌa del organizador.
 // Implementada como nodo de lista enlazada.
 typedef struct categoria {
     char nombre[100];
-    NodoItem *arbolItems;   // √Årbol con los √≠tems de esta categor√≠a
+    NodoItem *arbolItems;   // ¡rbol con los Ìtems de esta categorÌa
     Relacion *adyacencias;
-    struct categoria *sig;   // Siguiente categor√≠a (lista enlazada)
+    struct categoria *sig;   // Siguiente categorÌa (lista enlazada)
 } Categoria;
 
 // PROTOTIPOS
@@ -66,3 +66,4 @@ void cargarDesdeArchivo(Categoria **lista);
 void limpiarBuffer();
 
 #endif
+

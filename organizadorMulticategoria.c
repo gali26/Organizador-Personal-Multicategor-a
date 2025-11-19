@@ -1,20 +1,20 @@
-/*
-   ORGANIZADOR PERSONAL MULTICATEGOR√çA  
-   Proyecto Integrador - Algoritmos y Estructuras de Datos II
-   
-   Estructuras utilizadas:
-     - Lista enlazada de categor√≠as
-     - √Årbol binario de b√∫squeda de √≠tems por categor√≠a
-     - Grafo de relaciones entre categor√≠as
-   
-   Persistencia:
-     - Archivo de texto (.txt)
-   
-   Funcionalidades principales:
-     - Crear, buscar y eliminar categor√≠as
-     - Insertar y listar √≠tems ordenados alfab√©ticamente
-     - Guardar y cargar datos con corte de control
- */
+/************************************************************
+ *  ORGANIZADOR PERSONAL MULTICATEGORÕA  
+ *  Proyecto Integrador - Algoritmos y Estructuras de Datos II
+ *  
+ *  Estructuras utilizadas:
+ *    - Lista enlazada de categorÌas
+ *    - ¡rbol binario de b˙squeda de Ìtems por categorÌa
+ *    - Grafo de relaciones entre categorÌas
+ *  
+ *  Persistencia:
+ *    - Archivo de texto (.txt)
+ *  
+ *  Funcionalidades principales:
+ *    - Crear, buscar y eliminar categorÌas
+ *    - Insertar y listar Ìtems ordenados alfabÈticamente
+ *    - Guardar y cargar datos con corte de control
+ ************************************************************/
 
 #include "organizador.h"
 
@@ -66,7 +66,7 @@ void menuPrincipal(Categoria **lista) {
                 break;
 
             case 3:
-                printf("Nombre de la categor√≠a a eliminar: ");
+                printf("Nombre de la categorÌa a eliminar: ");
                 fgets(nombre, 100, stdin);
                 nombre[strcspn(nombre, "\n")] = 0;
                 if(eliminarCategoria(lista, nombre))
