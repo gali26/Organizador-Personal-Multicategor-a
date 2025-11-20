@@ -1,20 +1,23 @@
-/************************************************************
- *  ORGANIZADOR PERSONAL MULTICATEGORÍA  
- *  Proyecto Integrador - Algoritmos y Estructuras de Datos II
- *  
- *  Estructuras utilizadas:
- *    - Lista enlazada de categorías
- *    - Árbol binario de búsqueda de ítems por categoría
- *    - Grafo de relaciones entre categorías
- *  
- *  Persistencia:
- *    - Archivo de texto (.txt)
- *  
- *  Funcionalidades principales:
- *    - Crear, buscar y eliminar categorías
- *    - Insertar y listar ítems ordenados alfabéticamente
- *    - Guardar y cargar datos con corte de control
- ************************************************************/
+/*
+   ORGANIZADOR PERSONAL MULTICATEGORIA  
+   Proyecto Integrador â€“ Algoritmos y Estructuras de Datos II
+
+   Estructuras utilizadas:
+     - Lista enlazada de categorias
+     - Arbol binario de busqueda (ABB) para los items de cada categoria
+     - Grafo no dirigido mediante listas de adyacencia para relaciones entre categorias
+
+   Persistencia:
+     - Archivo de texto (organizador.txt) con marcadores y corte de control
+     - Archivo binario (organizador.dat) para respaldo estructurado de categorÃ­as e items
+
+   Funcionalidades principales:
+     - Crear, editar, buscar y eliminar categorias
+     - Insertar, buscar, editar y eliminar Ã­tems ordenados alfabeticamente (ABB)
+     - Establecer y eliminar relaciones entre categorias (grafo)
+     - Guardado y carga automatica desde archivos de texto y binarios
+     - Recorridos y busquedas eficientes en estructuras dinamicas
+*/
 
 #include "organizador.h"
 
@@ -22,9 +25,18 @@
 int main() {
     Categoria *listaCategorias = NULL;
 
+    // NUEVO: intenta cargar primero desde .dat
+    cargarDesdeBinario(&listaCategorias);
+
+// Si no existe .dat, cargar desde texto
+    if (!listaCategorias)
     cargarDesdeArchivo(&listaCategorias);
+
     menuPrincipal(&listaCategorias);
+
+// Guardar en ambos formatos
     guardarEnArchivo(listaCategorias);
+    guardarEnBinario(listaCategorias);
 
     return 0;
 }
@@ -45,10 +57,10 @@ void menuPrincipal(Categoria **lista) {
         printf("6. Buscar item por nombre (recorre ABBs)\n");
         printf("7. Editar item\n");
         printf("8. Editar categoria\n");
-        printf("9. Guardar y salir\n");
-        printf("10. Relacionar categorias\n");
-        printf("11. Ver relaciones de una categoria\n");
-        printf("12. Eliminar relacion entre categorias\n");
+        printf("9. Relacionar categorias\n");
+        printf("10. Ver relaciones de una categoria\n");
+        printf("11. Eliminar relacion entre categorias\n");
+        printf("12. Guardar y salir\n");
         printf("Seleccione: ");
         scanf("%d", &opcion);
         limpiarBuffer();
@@ -66,7 +78,7 @@ void menuPrincipal(Categoria **lista) {
                 break;
 
             case 3:
-                printf("Nombre de la categoría a eliminar: ");
+                printf("Nombre de la categorÃ­a a eliminar: ");
                 fgets(nombre, 100, stdin);
                 nombre[strcspn(nombre, "\n")] = 0;
                 if(eliminarCategoria(lista, nombre))
@@ -448,6 +460,7 @@ void liberarABB(NodoItem *raiz) {
     free(raiz);
 }
 
+// ARCHIVOS
 void guardarEnArchivo(Categoria *lista) {
     FILE *f = fopen("organizador.txt", "w");
     if(!f) return;
@@ -528,6 +541,86 @@ void cargarDesdeArchivo(Categoria **lista) {
 
     fclose(f);
 }
+
+// Guarda categorias e items en archivo binario .dat
+void guardarEnBinario(Categoria *lista) {
+    FILE *f = fopen("organizador.dat", "wb");
+    if (!f) return;
+
+    // Contar categorÃ­as
+    int cantCat = 0;
+    Categoria *c = lista;
+    while (c) {
+        cantCat++;
+        c = c->sig;
+    }
+
+    fwrite(&cantCat, sizeof(int), 1, f);
+
+    c = lista;
+    while (c) {
+        // Escribir nombre de categoria
+        fwrite(c->nombre, sizeof(char), 100, f);
+
+        // Contar items del ABB
+        int cantItems = 0;
+        void contar(NodoItem *n) {
+            if (!n) return;
+            cantItems++;
+            contar(n->izq);
+            contar(n->der);
+        }
+        contar(c->arbolItems);
+
+        fwrite(&cantItems, sizeof(int), 1, f);
+
+        // Escribir items en inorder
+        void escribir(NodoItem *n) {
+            if (!n) return;
+            escribir(n->izq);
+            fwrite(n->nombre, sizeof(char), 100, f);
+            fwrite(n->info, sizeof(char), 500, f);
+            escribir(n->der);
+        }
+        escribir(c->arbolItems);
+
+        c = c->sig;
+    }
+
+    fclose(f);
+}
+
+// Carga categorias e items desde archivo binario .dat
+void cargarDesdeBinario(Categoria **lista) {
+    FILE *f = fopen("organizador.dat", "rb");
+    if (!f) return;
+
+    int cantCat;
+    fread(&cantCat, sizeof(int), 1, f);
+
+    for (int i = 0; i < cantCat; i++) {
+        char nombreCat[100];
+        fread(nombreCat, sizeof(char), 100, f);
+
+        Categoria *nuevo = crearCategoria(lista, nombreCat);
+
+        int cantItems;
+        fread(&cantItems, sizeof(int), 1, f);
+
+        for (int j = 0; j < cantItems; j++) {
+            char nombreItem[100];
+            char infoItem[500];
+
+            fread(nombreItem, sizeof(char), 100, f);
+            fread(infoItem, sizeof(char), 500, f);
+
+            insertarItemABB(&nuevo->arbolItems, nombreItem, infoItem);
+        }
+    }
+
+    fclose(f);
+}
+
 // UTILIDADES
 void limpiarBuffer() {
     int c;
